@@ -1,0 +1,103 @@
+/* chess-tui stylesheet */
+
+Screen {
+    layout: vertical;
+    background: rgb(15, 19, 28);
+}
+
+#main {
+    height: 1fr;
+    width: 1fr;
+}
+
+#board-pane {
+    width: 32;
+    min-width: 32;
+    padding: 0 0;
+    border: solid rgb(60, 70, 90);
+}
+
+#side {
+    width: 1fr;
+    layout: vertical;
+}
+
+#analysis {
+    height: 1fr;
+    min-height: 10;
+    border: solid rgb(60, 70, 90);
+    padding: 0 1;
+}
+
+#explorer-moves {
+    height: 10;
+    min-height: 6;
+    border: solid rgb(60, 70, 90);
+    padding: 0 1;
+}
+
+#movelist {
+    height: 1fr;
+    min-height: 6;
+    border: solid rgb(60, 70, 90);
+    padding: 0 1;
+}
+
+#status {
+    height: 8;
+    border: solid rgb(60, 70, 90);
+    padding: 0 1;
+}
+
+#log {
+    height: 6;
+    border: solid rgb(60, 70, 90);
+    padding: 0 1;
+}
+
+#flash {
+    height: 1;
+    padding: 0 1;
+    color: rgb(255, 200, 120);
+}
+
+BoardView {
+    width: 32;
+    height: 20;
+}
+
+HelpScreen {
+    align: center middle;
+}
+
+#help-dialog {
+    width: 60;
+    height: auto;
+    padding: 1 2;
+    border: heavy rgb(120, 140, 180);
+    background: rgb(20, 26, 40);
+}
+
+NewGameScreen {
+    align: center middle;
+}
+
+#newgame-dialog {
+    width: 50;
+    height: auto;
+    padding: 1 2;
+    border: heavy rgb(120, 140, 180);
+    background: rgb(20, 26, 40);
+}
+
+PgnLoadScreen {
+    align: center middle;
+}
+
+#pgn-dialog {
+    width: 80;
+    height: 24;
+    padding: 1 2;
+    border: heavy rgb(120, 140, 180);
+    background: rgb(20, 26, 40);
+}

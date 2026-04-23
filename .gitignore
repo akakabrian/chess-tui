@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+tests/out/*.svg
+*.log
+# vendored third-party engine/book payloads larger than needed in git:
+/vendor/
+/data/puzzles_full.csv
