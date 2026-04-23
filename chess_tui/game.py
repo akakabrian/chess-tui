@@ -94,9 +94,11 @@ class Game:
         behaviour found in most GUI analysis boards.
         """
         if self._ply_cursor != self.total_plies:
-            # Truncate history from cursor forward.
+            # Truncate history from cursor forward. Replay from start_board
+            # (not chess.Board()) so custom initial positions — puzzles,
+            # imported PGNs with a SetUp/FEN header — are preserved.
             new_stack = self.board.move_stack[: self._ply_cursor]
-            replay = chess.Board()
+            replay = self.start_board.copy()
             for mv in new_stack:
                 replay.push(mv)
             self.board = replay

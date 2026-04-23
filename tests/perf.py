@@ -17,19 +17,18 @@ from __future__ import annotations
 import asyncio
 import statistics
 import time
-from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 import chess
 
 from chess_tui.app import ChessApp
 from chess_tui.board_view import BoardView
 from chess_tui.book import OpeningBook
-from chess_tui.engine import EngineSpec, MultiEngineAnalyzer, discover_engines
+from chess_tui.engine import MultiEngineAnalyzer, discover_engines
 from chess_tui.game import Game, Mode
 
 
-def _bench(name: str, fn: Callable[[], None], *,
+def _bench(name: str, fn: Callable[[], Any], *,
            iters: int = 200, warmup: int = 10) -> None:
     for _ in range(warmup):
         fn()

@@ -20,15 +20,13 @@ import sys
 import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Awaitable, Callable, Optional
+from typing import Any, Awaitable, Callable, Optional
 
 import chess
 
 from chess_tui.app import ChessApp
-from chess_tui.board_view import BoardView
-from chess_tui.engine import EngineSpec, discover_engines
+from chess_tui.engine import discover_engines
 from chess_tui.game import Mode
-from chess_tui.puzzles import Puzzle, PuzzleSession
 
 
 REPO = Path(__file__).resolve().parent.parent
@@ -46,9 +44,9 @@ def _static_text(widget) -> str:
     return str(r)
 
 
-def fresh_app(**kwargs) -> ChessApp:
+def fresh_app(**kwargs: Any) -> ChessApp:
     """App with analysis disabled and no engines — deterministic / fast."""
-    defaults = dict(engines=[], analysis_enabled=False, mode=Mode.HOTSEAT)
+    defaults: dict[str, Any] = dict(engines=[], analysis_enabled=False, mode=Mode.HOTSEAT)
     defaults.update(kwargs)
     return ChessApp(**defaults)
 
@@ -254,6 +252,7 @@ async def scn_promotion_required(app: ChessApp, pilot) -> None:
     await pilot.pause()
     # Cursor to e7 (file 4, rank 6).
     bv = app.board_view
+    assert bv is not None
     bv.cursor_file = 4
     bv.cursor_rank = 6
     await pilot.press("space")  # select

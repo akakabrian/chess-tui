@@ -20,16 +20,15 @@ Launched via ``play.py --agent`` or environment ``CHESS_TUI_AGENT=1``.
 
 from __future__ import annotations
 
-import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import chess
 
 try:
-    from aiohttp import web
+    from aiohttp import web  # type: ignore[import-not-found]
 except ImportError:  # pragma: no cover - optional dep
-    web = None  # type: ignore
+    web = None  # type: ignore[assignment]
 
 log = logging.getLogger("chess_tui.agent_api")
 
@@ -70,23 +69,24 @@ def _state_dict(app) -> dict:
     }
 
 
-def build_app(app) -> "web.Application":
+def build_app(app):
     if web is None:
         raise RuntimeError("aiohttp not installed — pip install 'chess-tui[agent]'")
+    aioweb = web  # narrow for type-checker
 
-    routes = web.RouteTableDef()
+    routes = aioweb.RouteTableDef()
 
     @routes.get("/health")
     async def _health(req):
-        return web.json_response({"ok": True, "version": "0.1.0"})
+        return aioweb.json_response({"ok": True, "version": "0.1.0"})
 
     @routes.get("/state")
     async def _state(req):
-        return web.json_response(_state_dict(app))
+        return aioweb.json_response(_state_dict(app))
 
     @routes.get("/pgn")
     async def _pgn(req):
-        return web.Response(text=app.game.to_pgn(),
+        return aioweb.Response(text=app.game.to_pgn(),
                             content_type="application/x-chess-pgn")
 
     @routes.get("/book")
@@ -94,7 +94,7 @@ def build_app(app) -> "web.Application":
         fen = req.query.get("fen")
         board = chess.Board(fen) if fen else app.game.live_board()
         entries = app._book.entries(board)
-        return web.json_response({
+        return aioweb.json_response({
             "fen": board.fen(),
             "entries": [
                 {
@@ -113,12 +113,12 @@ def build_app(app) -> "web.Application":
         try:
             move = chess.Move.from_uci(uci)
         except Exception as e:
-            return web.json_response({"ok": False, "err": f"bad uci: {e}"}, status=400)
+            return aioweb.json_response({"ok": False, "err": f"bad uci: {e}"}, status=400)
         ok = app.game.try_move(move)
         if ok:
             app._kick_analysis()
             app._refresh_all_panels()
-        return web.json_response({"ok": ok, "state": _state_dict(app)})
+        return aioweb.json_response({"ok": ok, "state": _state_dict(app)})
 
     @routes.post("/reset")
     async def _reset(req):
@@ -133,7 +133,7 @@ def build_app(app) -> "web.Application":
                         mode=Mode.ANALYSIS)
         app._kick_analysis()
         app._refresh_all_panels()
-        return web.json_response({"ok": True, "state": _state_dict(app)})
+        return aioweb.json_response({"ok": True, "state": _state_dict(app)})
 
     @routes.post("/analyse")
     async def _analyse(req):
@@ -146,7 +146,7 @@ def build_app(app) -> "web.Application":
         from .engine import discover_engines
         specs = discover_engines()
         if not specs:
-            return web.json_response({"ok": False, "err": "no engine"}, status=503)
+            return aioweb.json_response({"ok": False, "err": "no engine"}, status=503)
         spec = specs[0]
         import chess.engine
         engine = chess.engine.SimpleEngine.popen_uci(spec.argv)
@@ -179,7 +179,7 @@ def build_app(app) -> "web.Application":
                 "mate_in": mate,
                 "pv_uci": [m.uci() for m in pv],
             })
-        return web.json_response({"ok": True, "engine": spec.name, "lines": out})
+        return aioweb.json_response({"ok": True, "engine": spec.name, "lines": out})
 
     @routes.post("/bestmove")
     async def _best(req):
@@ -192,15 +192,15 @@ def build_app(app) -> "web.Application":
         from .engine import bestmove, discover_engines
         specs = discover_engines()
         if not specs:
-            return web.json_response({"ok": False, "err": "no engine"}, status=503)
+            return aioweb.json_response({"ok": False, "err": "no engine"}, status=503)
         mv = bestmove(specs[0], app.game.live_board(), time_limit=t)
-        return web.json_response({
+        return aioweb.json_response({
             "ok": True,
             "uci": mv.uci() if mv else None,
             "engine": specs[0].name,
         })
 
-    waio = web.Application()
+    waio = aioweb.Application()
     waio.add_routes(routes)
     return waio
 

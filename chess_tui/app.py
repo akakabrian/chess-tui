@@ -22,7 +22,7 @@ import logging
 import random
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import chess
 from rich.style import Style
@@ -32,7 +32,6 @@ from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, RichLog, Static
 
-from . import pieces
 from .board_view import BoardClicked, BoardView
 from .book import OpeningBook
 from .engine import (
@@ -42,7 +41,7 @@ from .engine import (
     bestmove,
     discover_engines,
 )
-from .game import ClockState, Game, Mode
+from .game import Game, Mode
 from .puzzles import PuzzleSession, load_puzzles, pick_puzzle
 from .screens import HelpScreen, NewGameScreen, PromotionScreen
 
@@ -217,6 +216,8 @@ class ChessApp(App):
             self.run_worker(self._launch_agent_api, exclusive=True, group="agent")
 
     async def _launch_agent_api(self) -> None:
+        if self._agent_port is None:
+            return
         try:
             from .agent_api import start_server
             self._agent_runner = await start_server(self, port=self._agent_port)
