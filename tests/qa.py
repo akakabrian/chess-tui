@@ -283,6 +283,30 @@ async def scn_state_snapshot_works(app: ChessApp, pilot) -> None:
     assert "1. e4" in pgn, pgn
 
 
+async def scn_no_engine_analysis_off(app: ChessApp, pilot) -> None:
+    """App with no engines must not crash when analysis is toggled."""
+    await pilot.pause()
+    app.action_toggle_analysis()
+    await pilot.pause()
+    app.action_toggle_analysis()
+    await pilot.pause()
+    # No assertion needed — not crashing is the pass condition.
+
+
+async def scn_unknown_fen_graceful(app: ChessApp, pilot) -> None:
+    """Loading a nonsense FEN must not crash the app."""
+    import chess
+    try:
+        app.game.board = chess.Board("not/a/fen/at/all")
+        raise RuntimeError("should have raised")
+    except ValueError:
+        pass  # python-chess rejects bad FEN — expected
+    # App state is unchanged; render still works.
+    assert app.board_view is not None
+    rendered = app.board_view.render()
+    assert "♟" in rendered.plain
+
+
 # ------------------------ engine integration (opt) -------------------------
 
 async def scn_engine_analyser_publishes(app: ChessApp, pilot) -> None:
@@ -341,6 +365,8 @@ SCENARIOS: list[Scenario] = [
     Scenario("puzzle_mode_sets_up",    scn_puzzle_mode_sets_up),
     Scenario("promotion_required",     scn_promotion_required),
     Scenario("state_snapshot_works",   scn_state_snapshot_works),
+    Scenario("no_engine_analysis_off", scn_no_engine_analysis_off),
+    Scenario("unknown_fen_graceful",   scn_unknown_fen_graceful),
     Scenario("engine_analyser_publishes", scn_engine_analyser_publishes),
 ]
 
