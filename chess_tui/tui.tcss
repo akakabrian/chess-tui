@@ -11,7 +11,7 @@ Screen {
 }
 
 #board-pane {
-    width: 32;
+    width: 3fr;
     min-width: 32;
     padding: 0 0;
     border: solid rgb(60, 70, 90);
@@ -19,6 +19,8 @@ Screen {
 
 #side {
     width: 1fr;
+    min-width: 24;
+    max-width: 32;
     layout: vertical;
 }
 
